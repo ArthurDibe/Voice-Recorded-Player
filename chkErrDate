@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ $1 -ne 0 ]
+then
+	echo $(date) >> error.txt
+	echo "It was trying to $2" >> error.txt
+	echo ".................................................................." >> error.txt
+fi
+exit $1

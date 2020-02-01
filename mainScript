@@ -1,0 +1,42 @@
+#!/bin/bash
+
+
+./record.py audio*.wav 	# retrieve all .wav audios recorded by the software
+./chkErrDate $? "--ERROR ON RECORDING--" # check if some comand fail
+echo ""
+
+./play_audio.py audio*.wav  # retrieve all .wav audios and list them to ask the user to listen					
+./chkErrDate $? "--ERROR ON PLAYING--"
+echo ""
+
+echo ".................................................................."
+echo ""
+echo "FILE TRANSFERENCE"
+echo ""
+echo -n "Do you want to send remotely all the files?(y/n): "
+read send
+
+ls audio*.wav > audio_list.txt # record all .wav files created in the software 
+
+if [ "$send" = 'y' ] || [ "$send" = 'Y' ]
+then
+	zip -q audios.zip audio*.wav # compress all audio.wav into a .zip file
+	echo -n "Please inform the HOST NAME: "
+	read host
+	echo -n "Please inform your USERNAME: "
+	read username
+	echo ""
+	scp audios.zip $username@$host:. # transfer the .zip file into the user's home folder
+	./chkErrDate $? "send audio files in a compressed .zip"
+	
+	if [ $? -eq 0 ] #check if transference succeed
+	then
+		cat audio_list.txt >> files_sent.txt # record the transfered .wav files' name 
+	else
+		echo "UNEXPECTED ERROR: Check error.txt for details"	
+	fi
+else
+	echo ""
+	echo "SEE YOU NEXT TIME !!!"
+	echo "" 
+fi
